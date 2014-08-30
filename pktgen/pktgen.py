@@ -10,18 +10,27 @@ kpktgend_0  kpktgend_1  pgctrl
 """
 ####
 
-def pg_set(command,thread=0):
+def pgset(command,thread=0):
     f = open ("/proc/net/pktgen/kpktgend_"+str(thread),"a")
     f.write(command)
 
+def pgset_iface(command,interface="eth0"):
+    f = open ("/proc/net/pktgen/"+interface,"a")
+    f.write(command)
+
 class PacketGenerator(object):
-  def __init__(self,interface="eth0"):
+  def __init__(self,interface="eth0",debug=True):
     os.system("modprobe pktgen")
+    self.debug = debug
     self.cpus = multiprocessing.cpu_count()
     self.interface = interface
+    self.threads = 1
+
+    if self.debug:
+      print "Removing interface from threads"
     for c in range(self.cpus):
-      pg_set("rem_device_all",c)
-      pg_set("add_device "+self.interface,c)
+      pgset("rem_device_all",c)
+      pgset("add_device "+self.interface,c)
 
   def eth_status(self):
     f = open ("/proc/net/pktgen/"+self.interface,"r") 
@@ -43,11 +52,23 @@ class PacketGenerator(object):
     commands.append("count " + str(count))
     commands.append("pkt_size " + str(size))
 
+    for c in commands:
+      if self.debug:
+        print c
+      pgset_iface(c,self.interface)
+
+  def start(self):
+    pass
+
+  def stop(self):
+    pass
+
   def destroy(self):
     os.system("rmmod pktgen")
 
 if __name__ == "__main__":
   pg = PacketGenerator()
   pg.thread_status()
+  pg.configure("192.168.2.1",500)
   pg.eth_status()
   pg.destroy()
