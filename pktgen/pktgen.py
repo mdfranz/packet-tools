@@ -1,6 +1,6 @@
 #!/usr/bin/env python 
 
-import multiprocessing,os
+import multiprocessing,os,netifaces
 
 DEBUG=True
 
@@ -9,6 +9,19 @@ root@opti330:/proc/net/pktgen# ls
 kpktgend_0  kpktgend_1  pgctrl
 """
 ####
+
+def get_local_mac(interface):
+  """Return the physical address for a given NIC"""
+  pass
+
+def get_remote_mac(address):
+  """Return mac of remote host given an IP"""
+  f = open ("/proc/net/arp","r")
+  for l in f:
+    entry = l.rstrip().split()
+    if address == entry[0]:
+      return entry[3]
+  # TODO handle gateway
 
 def pgset(command,thread=0):
     f = open ("/proc/net/pktgen/kpktgend_"+str(thread),"a")
@@ -46,11 +59,19 @@ class PacketGenerator(object):
       for l in f:
         print l.rstrip()
 
-  def configure(self,target,pps_rate,size=250,count=100,thread=0):
+  def configure(self,target,delay=100000,size=250,count=10,thread=0):
     commands = []
     commands.append("dst " + target)
     commands.append("count " + str(count))
+    commands.append("delay " + str(delay))
     commands.append("pkt_size " + str(size))
+
+    if target == "127.0.0.1":
+      commands.append("dst_mac 00:00:00:00:00:00")
+      commands.append("src_mac 00:00:00:00:00:00")
+    else:
+      os.system("ping -c 5 "+ target)
+      commands.append("dst_mac "+ get_remote_mac(target))
 
     for c in commands:
       if self.debug:
@@ -69,6 +90,5 @@ class PacketGenerator(object):
 if __name__ == "__main__":
   pg = PacketGenerator()
   pg.thread_status()
-  pg.configure("192.168.2.1",500)
+  pg.configure("192.168.2.203")
   pg.eth_status()
-  pg.destroy()
