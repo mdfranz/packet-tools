@@ -1,0 +1,10 @@
+service discard
+{
+    disable   = no
+    type    = INTERNAL
+    id    = discard-dgram
+    socket_type = dgram
+    protocol  = udp
+    user    = root
+    wait    = yes
+ } 

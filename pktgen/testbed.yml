@@ -12,7 +12,7 @@
       apt: pkg=iperf state=latest
 
     - name: rrd config for collectd
-      copy: src=rrd.conf dest=/etc/collectd/collectd.conf.d/rrd.conf
+      copy: src=ansible-files/rrd.conf dest=/etc/collectd/collectd.conf.d/rrd.conf
 
     - name: install python-netifaces
       apt: pkg=python-netifaces state=latest
@@ -22,3 +22,12 @@
 
     - name: restart collectd
       service: name=collectd state=restarted
+
+    - name: install xinetd
+      apt: pkg=xinetd state=latest
+
+    - name: enable discard service
+      copy: src=ansible-files/discard dest=/etc/xinetd.d/discard
+
+    - name: restart xinetd
+      service: name=xinetd state=restarted
