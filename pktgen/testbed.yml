@@ -1,0 +1,24 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+    - name: install collectd
+      apt: pkg=collectd state=latest
+
+    - name: install iperf
+      apt: pkg=iperf state=latest
+
+    - name: install iperf
+      apt: pkg=iperf state=latest
+
+    - name: rrd config for collectd
+      copy: src=rrd.conf dest=/etc/collectd/collectd.conf.d/rrd.conf
+
+    - name: install python-netifaces
+      apt: pkg=python-netifaces state=latest
+
+    - name: Install pktgen wrapper
+      copy: src=pktgen.py dest=/usr/local/bin/pktgen.py
+
+    - name: restart collectd
+      service: name=collectd state=restarted
