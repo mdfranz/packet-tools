@@ -12,7 +12,7 @@
       apt: pkg=iperf state=latest
 
     - name: rrd config for collectd
-      copy: src=ansible-files/rrd.conf dest=/etc/collectd/collectd.conf.d/rrd.conf
+      copy: src=ansible-files/collectd.conf dest=/etc/collectd/collectd.conf
 
     - name: install python-netifaces
       apt: pkg=python-netifaces state=latest

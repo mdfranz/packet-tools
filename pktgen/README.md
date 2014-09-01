@@ -1,3 +1,7 @@
+# Installation
+
+ > ansible-playbook -u ubuntu -sKk -i ~/hosts  testbed.yml
+
 
 # References
 
